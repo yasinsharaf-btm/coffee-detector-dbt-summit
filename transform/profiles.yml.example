@@ -2,12 +2,14 @@ coffee_detector:
   target: dev
   outputs:
     dev:
-      type: snowflake
-      account: CMVGRNF-COALESCE_WORKSHOPS
-      user: "{{ env_var('SNOWFLAKE_USER') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      role: SUMMIT26_HACKATHON_ROLE
-      database: SUMMIT26_HACKATHON_DB
-      warehouse: SUMMIT26_HACKATHON_WH
-      schema: dbt_dev
+      type: duckdb
+      path: 'coffee_detector.duckdb'
+      attach:
+        - path: '../ingestion/loffeelabs/files/warehouse.db'
+          alias: loffeelabs
+          read_only: true
+        - path: '../ingestion/overpass/files/warehouse.db'
+          alias: overpass
+          read_only: true
+      schema: main
       threads: 4

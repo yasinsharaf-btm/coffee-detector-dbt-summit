@@ -19,6 +19,7 @@ select
     beans.process_raw,
     beans.process_category,
     beans.flavor_profile,
+    beans.updated_at,
     beans.is_experimental,
     case when beans.is_experimental then 1 else 0 end as is_experimental_int,
     shops.osm_id as shop_osm_id,

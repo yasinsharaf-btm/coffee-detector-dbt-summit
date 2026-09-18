@@ -10,6 +10,7 @@ Run locally with:
     fivetran debug --configuration configuration.json
 """
 
+import re
 import time
 
 import requests
@@ -17,7 +18,9 @@ from fivetran_connector_sdk import Connector
 from fivetran_connector_sdk import Logging as log
 from fivetran_connector_sdk import Operations as op
 
-BASE_URL = "https://api.loffeelabs.com/api/v2"
+# Real base URL confirmed by live testing — the docs page's "api.loffeelabs.com"
+# subdomain does not exist in DNS.
+BASE_URL = "https://loffeelabs.com/api/v2"
 PAGE_LIMIT = 50
 RATE_LIMIT_SECONDS = 3
 
@@ -35,6 +38,20 @@ def _get(endpoint: str, headers: dict, params: dict | None = None) -> requests.R
     resp = requests.get(f"{BASE_URL}/{endpoint}", headers=headers, params=params, timeout=30)
     resp.raise_for_status()
     return resp
+
+
+def _normalize_key(key: str) -> str:
+    """LoffeeLabs bean payloads mix hyphens, camelCase, and punctuation
+    (e.g. "roast-name", "updatedAt", "price-per-cup-(low)"). Normalize to
+    snake_case so downstream SQL never needs quoted identifiers."""
+    key = re.sub(r"(?<!^)(?=[A-Z])", "_", key)
+    key = key.lower()
+    key = re.sub(r"[^a-z0-9]+", "_", key)
+    return key.strip("_")
+
+
+def _normalize_row(row: dict) -> dict:
+    return {_normalize_key(k): v for k, v in row.items()}
 
 
 def _extract_list(payload):
@@ -57,7 +74,7 @@ def _sync_beans(headers: dict, state: dict):
             break
 
         for bean in beans:
-            yield op.upsert(table="beans", data=bean)
+            yield op.upsert(table="beans", data=_normalize_row(bean))
 
         state["last_page"] = page
         yield op.checkpoint(state=state)

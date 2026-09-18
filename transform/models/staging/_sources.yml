@@ -2,26 +2,21 @@ version: 2
 
 sources:
   - name: loffeelabs
-    # TODO: confirm actual Fivetran destination schema once the connector is deployed
-    # (Fivetran normally names the schema after the connector's configured "schema" value).
-    database: SUMMIT26_HACKATHON_DB
-    schema: loffeelabs
+    # local DuckDB warehouse produced by `fivetran debug` in ingestion/loffeelabs/,
+    # attached under the "loffeelabs" alias in profiles.yml
+    database: loffeelabs
+    schema: tester
     tables:
       - name: beans
-        identifier: beans
       - name: roasters
-        identifier: roasters
       - name: processes
-        identifier: processes
       - name: origins
-        identifier: origins
       - name: varieties
-        identifier: varieties
 
   - name: overpass
-    # TODO: confirm actual Fivetran destination schema once the connector is deployed
-    database: SUMMIT26_HACKATHON_DB
-    schema: overpass
+    # local DuckDB warehouse produced by `fivetran debug` in ingestion/overpass/,
+    # attached under the "overpass" alias in profiles.yml
+    database: overpass
+    schema: tester
     tables:
       - name: shops
-        identifier: shops

@@ -1,6 +1,9 @@
--- TODO: column names below assume the LoffeeLabs bean payload shape described in the
--- project brief (id, name, roaster, origin, variety, process, flavor notes). Adjust once
--- the connector is deployed and the real Snowflake column names are known.
+-- Column names verified against a live LoffeeLabs API call. The connector
+-- normalizes the raw payload's hyphenated/camelCase keys (roast-name,
+-- updatedAt, price-per-cup-(low), ...) to snake_case before landing them, so
+-- these match the connector's output columns directly. There is no separate
+-- "flavor_profile" field in the API — it's aliased here from "tasting"
+-- (free tier strips "tasting-tag"/"general-tag").
 
 with source as (
     select * from {{ source('loffeelabs', 'beans') }}
@@ -9,12 +12,13 @@ with source as (
 renamed as (
     select
         id as bean_id,
-        name as bean_name,
+        roast_name as bean_name,
         roaster as roaster_name,
         origin,
         variety,
         process as process_raw,
-        flavor_profile,
+        tasting as flavor_profile,
+        try_cast(updated_at as date) as updated_at,
         lower(trim(process)) as process_normalized
     from source
 )
@@ -27,6 +31,7 @@ select
     variety,
     process_raw,
     flavor_profile,
+    updated_at,
     case
         when process_normalized like '%anaerobic%' then 'anaerobic'
         when process_normalized like '%carbonic%' then 'carbonic_maceration'
