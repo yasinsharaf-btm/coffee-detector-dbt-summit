@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: fct_bean_availability
+    description: "Bean-level fact matching each bean to a physical shop by roaster name."
+
+  - name: fct_specialty_availability
+    description: "Per-shop rollup with a Specialty Score: experimental beans / total beans for the matched roaster."
+    columns:
+      - name: shop_osm_id
+        tests:
+          - unique
+          - not_null

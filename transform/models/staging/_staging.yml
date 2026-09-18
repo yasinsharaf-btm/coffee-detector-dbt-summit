@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_loffeelabs__beans
+    description: "Cleaned bean catalog with processing names normalized into a unified process_category flag."
+    columns:
+      - name: bean_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_loffeelabs__roasters
+    description: "Roaster dictionary values from the LoffeeLabs API."
+
+  - name: stg_overpass__shops
+    description: "Coffee shops queried from OpenStreetMap via Overpass, within the configured bounding box."
+    columns:
+      - name: osm_id
+        tests:
+          - unique
+          - not_null

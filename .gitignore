@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+files/
+warehouse.db
+state.json
+configuration.json
+*.duckdb
+.env
+.mcp.json
+
+# dbt
+transform/target/
+transform/dbt_packages/
+transform/logs/
+transform/profiles.yml

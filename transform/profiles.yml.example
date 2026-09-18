@@ -1,0 +1,13 @@
+coffee_detector:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: CMVGRNF-COALESCE_WORKSHOPS
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: SUMMIT26_HACKATHON_ROLE
+      database: SUMMIT26_HACKATHON_DB
+      warehouse: SUMMIT26_HACKATHON_WH
+      schema: dbt_dev
+      threads: 4
