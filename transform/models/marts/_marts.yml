@@ -2,8 +2,53 @@ version: 2
 
 models:
   - name: fct_bean_availability
-    description: "Bean-level fact matching each bean to a physical shop by roaster name."
+    description: "Bean-level fact matching each bean to a physical shop by roaster name. Bean-level semantic model for specialty coffee availability by shop/roaster."
 
+    semantic_model:
+      enabled: true
+      name: fct_bean_availability
+    agg_time_dimension: updated_at
+    columns:
+      - name: bean_id
+        entity:
+          type: primary
+          name: bean
+      - name: shop_osm_id
+        entity:
+          type: foreign
+          name: shop
+      - name: updated_at
+        dimension:
+          type: time
+        granularity: day
+      - name: roaster_city
+        dimension:
+          type: categorical
+      - name: process_category
+        dimension:
+          type: categorical
+      - name: flavor_profile
+        dimension:
+          type: categorical
+    metrics:
+      - name: bean_count
+        label: "Bean Count"
+        description: "Total count of beans in the catalog."
+        type: simple
+        agg: count
+        expr: bean_id
+      - name: experimental_bean_count
+        label: "Experimental Bean Count"
+        description: "Count of beans processed with an experimental method (anaerobic, carbonic maceration, thermal shock, co-ferment)."
+        type: simple
+        agg: sum
+        expr: is_experimental_int
+      - name: specialty_score
+        label: "Specialty Score"
+        description: "Ratio of experimental beans to total beans, per roaster/city/process cut."
+        type: ratio
+        numerator: experimental_bean_count
+        denominator: bean_count
   - name: fct_specialty_availability
     description: "Per-shop rollup with a Specialty Score: experimental beans / total beans for the matched roaster."
     columns:
